@@ -116,8 +116,7 @@
   (unless (file-directory-p emaXcode-yas-objc-root)
     (make-directory emaXcode-yas-objc-root))
   (let ((yas--creating-compiled-snippets t)
-        (dir emaXcode-yas-objc-root)
-        use-jit)
+        (dir emaXcode-yas-objc-root))
     (let* ((major-mode-and-parents (yas--compute-major-mode-and-parents
                                     (concat dir "/dummy")))
            (mode-sym (car major-mode-and-parents))
@@ -135,7 +134,7 @@
   (let (($path emaXcode-yas-apple-headers-directory)
         $header-files
         $yas-compiled-snippets
-        $return-type
+        ;;$return-type
         $fn-name
         $template-content
         $key-for-expand
@@ -148,11 +147,11 @@
 
     (mapc (lambda ($file)
             (with-temp-buffer
-              (insert-file $file)
+              (insert-file-contents-literally $file)
               (goto-char (point-min))
               (while (re-search-forward "^[\t ]*[+-][\t ]*\\(([^)]+)\\)\\([^;]+\\);" nil t)
                 (setq $key-for-expand "")
-                (setq $return-type (match-string 1))
+                ;;(setq $return-type (match-string 1))
                 (setq $fn-name (match-string 2))
                 (setq $template-content "")
                 ;; Set placeholder
@@ -194,7 +193,7 @@
         (setq $yas-compiled-snippets
               (or (ignore-errors
                     (read (with-temp-buffer
-                            (insert-file emaXcode-yas-objc-compiled-file)
+                            (insert-file-contents-literally emaXcode-yas-objc-compiled-file)
                             (buffer-string))))
                   '(yas-define-snippets 'objc-mode '())))
       (setq $yas-compiled-snippets '(yas-define-snippets 'objc-mode '())))
@@ -353,8 +352,9 @@
            (count (length line-err-info-list)))
       (while (> count 0)
         (when line-err-info-list
-          (let* ((file (flymake-ler-file (nth (1- count) line-err-info-list)))
-                 (full-file (flymake-ler-full-file (nth (1- count) line-err-info-list)))
+          (let* (
+                 ;; (file (flymake-ler-file (nth (1- count) line-err-info-list)))
+                 ;; (full-file (flymake-ler-full-file (nth (1- count) line-err-info-list)))
                  (text (flymake-ler-text (nth (1- count) line-err-info-list)))
                  (line (flymake-ler-line (nth (1- count) line-err-info-list))))
             (message "[%s] %s" line text)))
@@ -367,6 +367,9 @@
          (add-hook 'post-command-hook 'emaXcode-flymake-display-err-minibuffer))))
 
 ;; Set up objc-mode ------------------------------------------------------------
+
+(or (boundp 'ff-other-file-alist)
+    (defvar ff-other-file-alist nil))
 
 (defun emaXcode-etc-objc-setup ()
   (auto-revert-mode 1)
