@@ -60,7 +60,7 @@ As of May 26 2014, these are latest package
 
 ## Convert messages from Apple's header files to yasnippet
 
-Extract about 2668 messages from header files directory, and conviert them to a yasnippet file `.yas-compiled-snippets.el` with your existing snippets in objc-mode folder.
+Extract about 2668 messages from header files directory, and convert them to a yasnippet file `.yas-compiled-snippets.el` with your existing snippets in objc-mode folder.
 
 If header files directory path changed by Xcode's upgrade, set correct path to `emaXcode-yas-apple-headers-directory`. Currently "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/Frameworks/Foundation.framework/Headers"
 
