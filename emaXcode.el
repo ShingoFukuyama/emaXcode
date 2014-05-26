@@ -191,9 +191,12 @@
           $header-files)
 
     (if (file-exists-p emaXcode-yas-objc-compiled-file)
-        (setq $yas-compiled-snippets (read (with-temp-buffer
-                                             (insert-file emaXcode-yas-objc-compiled-file)
-                                             (buffer-string))))
+        (setq $yas-compiled-snippets
+              (or (ignore-errors
+                    (read (with-temp-buffer
+                            (insert-file emaXcode-yas-objc-compiled-file)
+                            (buffer-string))))
+                  '(yas-define-snippets 'objc-mode '())))
       (setq $yas-compiled-snippets '(yas-define-snippets 'objc-mode '())))
 
     (setf (nth 1 (nth 2 $yas-compiled-snippets))
@@ -300,7 +303,7 @@
   (setq ac-sources (delq 'ac-source-yasnippet ac-sources))
   (add-to-list 'ac-sources 'ac-source-emaXcode-yasnippet))
 
-(add-hook 'objc-mode-hook 'emaXcode-yas-ac-objc-setup)
+(add-hook 'objc-mode-hook 'emaXcode-yas-ac-objc-setup t)
 
 ;; Check error -----------------------------------------------------------------
 
