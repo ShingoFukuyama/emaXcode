@@ -52,6 +52,12 @@ As of May 26 2014, these are latest package
 (helm-mode 1)
 ```
 
+### This package
+
+```cl
+(require 'emaXcode)
+```
+
 ## Convert messages from Apple's header files to yasnippet
 
 Extract about 2668 messages from header files directory, and conviert them to a yasnippet file `.yas-compiled-snippets.el` with your existing snippets in objc-mode folder.
