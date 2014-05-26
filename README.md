@@ -68,7 +68,7 @@ If header files directory path changed by Xcode's upgrade, set correct path to `
 M-x emaXcode-yas-get-ios-messages-from-header-files
 ```
 
-## Swith between header and implementation files
+## Switch between header and implementation files
 
 ```cl
 M-x emaXcode-open-corresponding-file
