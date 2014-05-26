@@ -28,7 +28,7 @@ As of May 26 2014, these are latest package
 
 ## Simple premise setting for each requirement
 
-This order is matter.
+Load requirements in this order.
 
 ### auto-complete
 
