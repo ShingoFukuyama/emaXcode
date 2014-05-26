@@ -28,6 +28,8 @@ As of May 26 2014, these are latest package
 
 ## Simple premise setting for each requirement
 
+This order is matter.
+
 ### auto-complete
 
 ```cl
