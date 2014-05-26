@@ -24,6 +24,7 @@ As of May 26 2014, these are latest package
 * auto-complete.el  1.4.0
 * yasnippet.el  0.8.0
 * helm.el  1.5.6
+* s.el  1.9.0
 
 ## Simple premise setting for each requirement
 

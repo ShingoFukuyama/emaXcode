@@ -7,7 +7,7 @@
 ;; URL: https://github.com/ShingoFukuyama/emaXcode
 ;; Created: May 26 2014
 ;; Keywords: xcode, objective-c, yasnippet, auto-complete, helm
-;; Package-Requires: ((auto-complete "1.4.0) (yasnippet "0.8.0") (helm "1.5.6") (emacs "24.3.5"))
+;; Package-Requires: ((auto-complete "1.4.0) (yasnippet "0.8.0") (helm "1.5.6") (s "1.9.0) (emacs "24.3.5"))
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License as
