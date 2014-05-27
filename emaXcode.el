@@ -254,10 +254,9 @@
 (defvar emaXcode-yas-name-key (make-hash-table :test 'equal :size 300))
 (defvar emaXcode-yas-name-list nil)
 
-(defun emaXcode-yas-template-name-list ()
+(defun emaXcode-yas-set-source ()
   "Read objc snippets from objc-mode snippet folder, and set name list and name-key pair list."
-  (with-temp-buffer
-    (objc-mode)
+  (when (not emaXcode-yas-name-list)
     (let ((template (yas--all-templates (yas--get-snippet-tables)))
           name)
       (when template
@@ -272,28 +271,26 @@
                                  (yas--template-key temp)
                                  emaXcode-yas-name-key)
                         name)
-                      template))))))
-
-;; Set lists
-(emaXcode-yas-template-name-list)
-
-(ac-define-source emaXcode-yasnippet
-  `((depends yasnippet)
-    (candidates . emaXcode-yas-name-list)
-    (action . (lambda ()
-                (let* ((undo-inhibit-record-point t)
-                       (position (point))
-                       (completed (cdr ac-last-completion))
-                       (length (length completed))
-                       (beginning (- position length)))
-                  (delete-region beginning position)
-                  (insert (gethash completed emaXcode-yas-name-key))
-                  (yas-expand-from-trigger-key))))
-    (candidate-face . ac-yasnippet-candidate-face)
-    (selection-face . ac-yasnippet-selection-face)
-    (symbol . "yas")))
+                      template))))
+    (when emaXcode-yas-name-list
+      (ac-define-source emaXcode-yasnippet
+        `((depends yasnippet)
+          (candidates . emaXcode-yas-name-list)
+          (action . (lambda ()
+                      (let* ((undo-inhibit-record-point t)
+                             (position (point))
+                             (completed (cdr ac-last-completion))
+                             (length (length completed))
+                             (beginning (- position length)))
+                        (delete-region beginning position)
+                        (insert (gethash completed emaXcode-yas-name-key))
+                        (yas-expand-from-trigger-key))))
+          (candidate-face . ac-yasnippet-candidate-face)
+          (selection-face . ac-yasnippet-selection-face)
+          (symbol . "yas"))))))
 
 (defun emaXcode-yas-ac-objc-setup ()
+  (emaXcode-yas-set-source) ;; Set lists if name list has not set
   (add-to-list 'ac-modes 'objc-mode)
   (if (and (symbolp 'auto-complete-mode) (not (symbol-value 'auto-complete-mode)))
       (auto-complete-mode 1))
@@ -365,6 +362,15 @@
   (when emaXcode-check-error
     (set (make-local-variable 'post-command-hook)
          (add-hook 'post-command-hook 'emaXcode-flymake-display-err-minibuffer))))
+
+;; Relevant paths --------------------------------------------------------------
+
+(defun emaXcode-open-application-directory ()
+  (interactive)
+  (let ((path (expand-file-name "~/Library/Application Support/iPhone Simulator")))
+    (if (file-exists-p path)
+        (dired path)
+      (error (format "Directory not found: %s" path)))))
 
 ;; Set up objc-mode ------------------------------------------------------------
 
