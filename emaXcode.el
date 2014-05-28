@@ -339,6 +339,7 @@
       (auto-complete-mode 1))
   (set (make-local-variable 'ac-delay) 0.2)
   (set (make-local-variable 'ac-auto-show-menu) 0.5)
+  (set (make-local-variable 'ac-ignore-case) t)
   (setq ac-sources (delq 'ac-source-yasnippet ac-sources))
   (add-to-list 'ac-sources 'ac-source-emaXcode-yasnippet))
 
