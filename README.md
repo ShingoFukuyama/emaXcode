@@ -70,6 +70,9 @@ If header directory paths changed by Xcode's upgrade, set correct paths list to 
 ```cl
 M-x emaXcode-yas-get-objc-messages-from-header-files
 ```
+After this converting done, `.yas-compiled-snippets.el` is generated at your objc-mode snippets directory.
+Restart Emacs, and open Objective-C file. You would realize that it takes a while to load a huge yasnippet file, but is only once.
+
 
 ## Switch between header and implementation files
 
