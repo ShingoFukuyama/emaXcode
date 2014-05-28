@@ -15,7 +15,7 @@ I don't care other than this environment. Additionary, I change this package on 
 
 * Mac OSX 10.8.5 (MBPR2012)
 * Xcode 5.1.1
-* Emacs Cocoa 24.3.5 (from Homebrew)
+* Emacs Cocoa 24.3.1 (from Homebrew)
 
 ## Requirement
 
@@ -63,12 +63,12 @@ Load requirements in this order.
 
 ## Convert messages from Apple's header files to yasnippet
 
-Extract about 2668 messages from header files directory, and convert them to a yasnippet file `.yas-compiled-snippets.el` with your existing snippets in objc-mode folder.
+Extract about 4,460 messages/functions from header directories (Foundation.framework, UIKit.framework), and convert them to a yasnippet file `.yas-compiled-snippets.el` with your existing snippets in objc-mode folder.
 
-If header files directory path changed by Xcode's upgrade, set correct path to `emaXcode-yas-apple-headers-directory`. Currently "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/Frameworks/Foundation.framework/Headers"
+If header directory paths changed by Xcode's upgrade, set correct paths list to `emaXcode-yas-objc-header-directories-list`.
 
 ```cl
-M-x emaXcode-yas-get-ios-messages-from-header-files
+M-x emaXcode-yas-get-objc-messages-from-header-files
 ```
 
 ## Switch between header and implementation files

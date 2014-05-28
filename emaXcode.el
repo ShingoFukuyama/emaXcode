@@ -98,11 +98,12 @@
 
 ;; Make compiled yasnippet file from Apple's header files ----------------------
 
-(defcustom emaXcode-yas-apple-headers-directory
-  "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/Frameworks/Foundation.framework/Headers"
-  "Apple's header directory"
+(defcustom emaXcode-yas-objc-header-directories-list
+  '("/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/Frameworks/Foundation.framework/Headers"
+    "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/Frameworks/UIKit.framework/Headers")
+  "List header directory paths"
   :group 'emaXcode
-  :type 'string)
+  :type 'list)
 (defvar emaXcode-yas-root (if (listp yas-snippet-dirs)
                               (car yas-snippet-dirs)
                             yas-snippet-dirs))
@@ -127,12 +128,9 @@
                     (yas--load-directory-1 ',dir ',mode-sym))))
         (funcall fun)))))
 
-(defun emaXcode-yas-get-ios-messages-from-header-files ()
+(defun emaXcode-yas-get-objc-messages-from-header-files ()
   (interactive)
-  (unless (file-directory-p emaXcode-yas-apple-headers-directory)
-    (error (format "Apples's directory doesn't exist: %s" emaXcode-yas-apple-headers-directory)))
-  (let (($path emaXcode-yas-apple-headers-directory)
-        $header-files
+  (let ($header-files
         $yas-compiled-snippets
         ;;$return-type
         $fn-name
@@ -141,53 +139,98 @@
         $list)
     (emaXcode-yas-compile-subdir) ;; (yas-recompile-all)
 
-    (setq $header-files (split-string
-                         (shell-command-to-string
-                          (concat "find " $path " -name '*.h' -type f"))))
+    (mapc (lambda ($path)
+            (unless (file-directory-p $path)
+              (error (format "Apples's directory doesn't exist: %s" $path)))
 
-    (mapc (lambda ($file)
-            (with-temp-buffer
-              (insert-file-contents-literally $file)
-              (goto-char (point-min))
-              (while (re-search-forward "^[\t ]*[+-][\t ]*\\(([^)]+)\\)\\([^;]+\\);" nil t)
-                (setq $key-for-expand "")
-                ;;(setq $return-type (match-string 1))
-                (setq $fn-name (match-string 2))
-                (setq $template-content "")
-                ;; Set placeholder
-                (if (string-match ":" $fn-name)
+            (mapc (lambda ($file)
                     (with-temp-buffer
-                      (insert $fn-name)
+                      (insert-file-contents-literally $file)
                       (goto-char (point-min))
-                      (while (re-search-forward "[a-zA-Z0-9_]*:" nil t)
-                        (setq $key-for-expand (concat $key-for-expand (match-string 0))))
+                      (while (re-search-forward "^[\t ]*[+-][\t ]*\\(([^)]+)\\)\\([^;]+\\);" nil t)
+                        (setq $key-for-expand "")
+                        ;;(setq $return-type (match-string 1))
+                        (setq $fn-name (match-string 2))
+                        (setq $template-content "")
+                        ;; Set yasnippet placeholder
+                        (if (string-match ":" $fn-name)
+                            (with-temp-buffer
+                              (insert $fn-name)
+                              (goto-char (point-min))
+                              (while (re-search-forward "[a-zA-Z0-9_]*:" nil t)
+                                (setq $key-for-expand (concat $key-for-expand (match-string 0))))
+                              (goto-char (point-min))
+                              (let (($num 1) $po1 $po2 $rep)
+                                (while (re-search-forward ":[\t ]*(" nil t)
+                                  (backward-char 1)
+                                  (setq $po1 (point))
+                                  (forward-sexp)
+                                  (re-search-forward "[\t ]*[a-zA-Z0-9_$]*" nil t)
+                                  (setq $po2 (point))
+                                  (setq $rep (buffer-substring-no-properties $po1 $po2))
+                                  (delete-region $po1 $po2)
+                                  (insert (format "${%d:%s}" $num $rep))
+                                  (setq $num (1+ $num))))
+                              (setq $template-content (buffer-string)))
+                          (setq $key-for-expand $fn-name)
+                          (setq $template-content $fn-name))
+                        (when (equal $key-for-expand "")
+                          (setq $key-for-expand nil))
+                        ;; (when (string-match "[ (]" $key-for-expand)
+                        ;;   (setq $key-for-expand (car (split-string $key-for-expand "[ (]"))))
+                        (setq $list (cons
+                                     (list
+                                      $key-for-expand   ; key
+                                      $template-content ; template-content
+                                      $fn-name          ; name
+                                      nil               ; condition
+                                      nil               ; group
+                                      '((yas/indent-line 'fixed) (yas/wrap-around-region 'nil)) nil nil nil)
+                                     $list)))
+                      ;; Extract UIKIT_EXTERN functions
                       (goto-char (point-min))
-                      (let (($num 1) $po1 $po2 $rep)
-                        (while (re-search-forward ":[\t ]*(" nil t)
-                          (backward-char 1)
-                          (setq $po1 (point))
-                          (forward-sexp)
-                          (re-search-forward "[\t ]*[a-zA-Z0-9_$]*" nil t)
-                          (setq $po2 (point))
-                          (setq $rep (buffer-substring-no-properties $po1 $po2))
-                          (delete-region $po1 $po2)
-                          (insert (format "${%d:%s}" $num $rep))
-                          (setq $num (1+ $num))))
-                      (setq $template-content (buffer-string)))
-                  (setq $key-for-expand $fn-name)
-                  (setq $template-content $fn-name))
-                ;; (when (string-match "[ (]" $key-for-expand)
-                ;;   (setq $key-for-expand (car (split-string $key-for-expand "[ (]"))))
-                (setq $list (cons
-                             (list
-                              $key-for-expand   ; key
-                              $template-content ; template-content
-                              $fn-name          ; name
-                              nil               ; condition
-                              nil               ; group
-                              '((yas/indent-line 'fixed) (yas/wrap-around-region 'nil)) nil nil nil)
-                             $list)))))
-          $header-files)
+                      (while (re-search-forward "^UIKIT\_EXTERN[\t ]*\\([a-zA-Z0-9]*\\)[\t ]*\\*?\\([^;]*\\)" nil t)
+                        (setq $key-for-expand "")
+                        ;; (setq $return-type (match-string 1))
+                        (setq $fn-name (match-string 2))
+                        (setq $template-content "")
+                        ;; Set yasnippet placeholder
+                        (if (string-match "([^)]+)" $fn-name)
+                            (with-temp-buffer
+                              (insert $fn-name)
+                              (goto-char (point-min))
+                              (when (re-search-forward "(" nil t)
+                                (setq $key-for-expand (buffer-substring-no-properties (point-min) (1- (point)))))
+                              (let (($num 1) ($po (point)) $rep)
+                                (while (re-search-forward "\\([^,]+\\)" (1- (point-max)) t)
+                                  (setq $rep (buffer-substring-no-properties $po (point)))
+                                  (delete-region $po (point))
+                                  ;; For a space after a preceding comma
+                                  (if (string-match "^\\s-" $rep)
+                                      (insert (format " ${%d:%s}" $num $rep))
+                                    (insert (format "${%d:%s}" $num $rep)))
+                                  (re-search-forward "," nil t)
+                                  (setq $po (point))
+                                  (setq $num (1+ $num))))
+                              (setq $template-content (buffer-string)))
+                          (setq $key-for-expand $fn-name)
+                          (setq $template-content $fn-name))
+                        (when (equal $key-for-expand "")
+                          (setq $key-for-expand nil))
+                        (setq $list (cons
+                                     (list
+                                      $key-for-expand   ; key
+                                      $template-content ; template-content
+                                      $fn-name          ; name
+                                      nil               ; condition
+                                      nil               ; group
+                                      '((yas/indent-line 'fixed) (yas/wrap-around-region 'nil)) nil nil nil)
+                                     $list)))))
+                  ;; Make header files list
+                  (split-string
+                   (shell-command-to-string
+                    (concat "find " $path " -name '*.h' -type f")))))
+          emaXcode-yas-objc-header-directories-list)
 
     (if (file-exists-p emaXcode-yas-objc-compiled-file)
         (setq $yas-compiled-snippets
@@ -205,7 +248,7 @@
       (insert (prin1-to-string $yas-compiled-snippets)))
     (message "Extract %s messages and save to %s." (length $list) emaXcode-yas-objc-compiled-file)))
 
-;; (emaXcode-yas-get-ios-messages-from-header-files)
+;; (emaXcode-yas-get-objc-messages-from-header-files)
 
 ;; Chenge yasnippet settings ---------------------------------------------------
 
