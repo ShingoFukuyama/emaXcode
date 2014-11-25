@@ -92,7 +92,8 @@
                         year
                         emaXcode-your-name-for-template
                         class-name
-                        class-name))))))
+                        class-name)))
+      (if (eq major-mode 'dired-mode) (revert-buffer)))))
 
 
 
@@ -294,7 +295,7 @@
 
 ;; Set snippets to auto-complete -----------------------------------------------
 
-(defvar emaXcode-yas-name-key (make-hash-table :test 'equal :size 300))
+(defvar emaXcode-yas-name-key (make-hash-table :test 'equal :size 5000))
 (defvar emaXcode-yas-name-list nil)
 
 (defun emaXcode-yas-set-source ()

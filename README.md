@@ -3,11 +3,11 @@
 
 auto-complete + yasnippet
 
-![auto-complete + yasnippet](https://raw2.github.com/ShingoFukuyama/images/master/emaXcode/emaXcode1.gif)
+![auto-complete + yasnippet](https://raw.githubusercontent.com/ShingoFukuyama/images/master/emaXcode/emaXcode1.gif)
 
 helm + yasnippet
 
-![helm + yasnippet](https://raw2.github.com/ShingoFukuyama/images/master/emaXcode/emaXcode2.gif)
+![helm + yasnippet](https://raw.githubusercontent.com/ShingoFukuyama/images/master/emaXcode/emaXcode2.gif)
 
 ## Environment
 
